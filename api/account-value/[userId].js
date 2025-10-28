@@ -16,8 +16,9 @@ module.exports = async (req, res) => {
   try {
     const fetch = (await import('node-fetch')).default;
     
+    / Try to fetch user's collectibles from catalog API
     const response = await fetch(
-      `https:/inventory.roblox.com/v1/users/${userId}/assets/collectibles?sortOrder=Asc&limit=100`,
+      `https:/catalog.roblox.com/v1/users/${userId}/items/collectibles?limit=100`,
       {
         headers: {
           'User-Agent': 'Roblox/WinInet',
@@ -56,4 +57,3 @@ module.exports = async (req, res) => {
     });
   }
 };
-
