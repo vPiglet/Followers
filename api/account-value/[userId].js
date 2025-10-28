@@ -16,12 +16,12 @@ module.exports = async (req, res) => {
   try {
     const fetch = (await import('node-fetch')).default;
     
-    / Try to fetch user's collectibles from catalog API
+    / Fetch from Rolimons API
     const response = await fetch(
-      `https:/catalog.roblox.com/v1/users/${userId}/items/collectibles?limit=100`,
+      `https:/www.rolimons.com/api/playerassets/${userId}`,
       {
         headers: {
-          'User-Agent': 'Roblox/WinInet',
+          'User-Agent': 'Mozilla/5.0',
           'Accept': 'application/json',
         },
       }
@@ -37,12 +37,9 @@ module.exports = async (req, res) => {
     const data = await response.json();
     let totalValue = 0;
 
-    if (data && data.data && Array.isArray(data.data)) {
-      for (const item of data.data) {
-        if (item.recentAveragePrice && item.recentAveragePrice > 0) {
-          totalValue += item.recentAveragePrice;
-        }
-      }
+    / Rolimons returns { success: true, total_rap: 12345, ... }
+    if (data && data.success && data.total_rap) {
+      totalValue = data.total_rap;
     }
 
     return res.status(200).json({ 
@@ -51,6 +48,7 @@ module.exports = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error fetching from Rolimons:', error);
     return res.status(200).json({ 
       accountValue: 0,
       userId: userId 
