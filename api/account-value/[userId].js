@@ -1,11 +1,10 @@
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) {
     return res.status(400).json({ error: 'userId is required' });
   }
 
-  / Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -15,6 +14,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    const fetch = (await import('node-fetch')).default;
+    
     const response = await fetch(
       `https:/inventory.roblox.com/v1/users/${userId}/assets/collectibles?sortOrder=Asc&limit=100`,
       {
@@ -26,7 +27,6 @@ export default async function handler(req, res) {
     );
 
     if (!response.ok) {
-      console.error(`Roblox API error: ${response.status} ${response.statusText}`);
       return res.status(200).json({ 
         accountValue: 0,
         userId: userId 
@@ -50,10 +50,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Error fetching account value:', error);
     return res.status(200).json({ 
       accountValue: 0,
       userId: userId 
     });
   }
-}
+};
+
